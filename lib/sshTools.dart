@@ -7,6 +7,7 @@ import 'dart:io';
 
 final basePath = '/var/tmp/raspi_monitor';
 final zippedFileName = 'raspi_monitor.gz';
+final unzippedFileName = 'raspi_monitor';
 
 Future<SSHClient> getSSHClient(Server server) async {
   final client = SSHClient(
@@ -50,6 +51,12 @@ Future<String> _getSha1(String filePath) async {
   }
 }
 
+Future<List<String>> _getLatestSha1s(String arch) async {
+  final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
+  final lines = response.body.split("\n");
+  return [lines[0].split(" ")[0], lines[1].split(" ")[0]]; // unzipped, zipped
+}
+
 Future<String> _downloadBinary(String arch) async {
   final localPath = (await getApplicationDocumentsDirectory()).path + '/$arch/$zippedFileName';
   final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/$zippedFileName');
@@ -59,39 +66,53 @@ Future<String> _downloadBinary(String arch) async {
   return localPath;
 }
 
-Future<String> _downloadBinaryCached(String arch) async {
+Future<String> _downloadBinaryCached(String arch, String latestSha1) async {
   final localPath = (await getApplicationDocumentsDirectory()).path + '/$arch/$zippedFileName';
   final localSha1 = await _getSha1(localPath);
   if (localSha1 == null) {
     // file doesn't exist
-    print("file doesn't exist");
     return _downloadBinary(arch);
-  } else {
+  } else if (localSha1 == latestSha1) {
     // file exists
-    final sha1Response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
-    final remoteSha1 = sha1Response.body.split("\n")[1].split(" ")[0];
-    if (localSha1 == remoteSha1) {
-      print("file same");
-      return localPath;
-    }
-    print("file old");
-    print(localSha1);
-    print(remoteSha1);
+    return localPath;
+  } else {
+    // file old
     return _downloadBinary(arch);
   }
 }
 
+Future<String> _getSftpSha1(SSHClient client) async {
+  try {
+    final stdout = await client.execute("sha1sum $basePath/raspi_monitor");
+    return stdout.split(" ")[0];
+  } catch (e) {
+    return null;
+  }
+}
+
 Future<void> _uploadBinary(SSHClient client, String path) async {
-  final fileName = path.split('/').last;
   await client.execute('mkdir -p $basePath');
   await client.sftpUpload(path: path, toPath: '$basePath');
-  await client.execute('gzip -d $basePath/$fileName');
+  await client.execute('gzip -d $basePath/$unzippedFileName');
+}
+
+Future<void> _setPermission(SSHClient client) async {
+  await client.execute('chmod 770 $basePath/$unzippedFileName');
+}
+
+Future<void> _uploadBinaryCached(SSHClient client, String path, String latestSha1) async {
+  final localSha1 = await _getSftpSha1(client);
+  if (localSha1 == null || localSha1 != latestSha1) {
+    await _uploadBinary(client, path);
+  }
+  await _setPermission(client);
 }
 
 Future<void> uploadBinary(SSHClient client) async {
   final arch = await _getArch(client);
-  final binPath = await _downloadBinaryCached(arch);
-  await _uploadBinary(client, binPath);
+  final latestSha1s = await _getLatestSha1s(arch);
+  final binPath = await _downloadBinaryCached(arch, latestSha1s[1]);
+  await _uploadBinaryCached(client, binPath, latestSha1s[0]);
 }
 
 Future<String> getSysInfo(SSHClient client) async {

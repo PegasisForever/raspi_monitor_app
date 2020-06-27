@@ -52,9 +52,13 @@ Future<String> _getSha1(String filePath) async {
 }
 
 Future<List<String>> _getLatestSha1s(String arch) async {
-  final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
-  final lines = response.body.split("\n");
-  return [lines[0].split(" ")[0], lines[1].split(" ")[0]]; // unzipped, zipped
+  try {
+    final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
+    final lines = response.body.split("\n");
+    return [lines[0].split(" ")[0], lines[1].split(" ")[0]]; // unzipped, zipped
+  } catch (e) {
+    return [null, null];
+  }
 }
 
 Future<String> _downloadBinary(String arch) async {
@@ -69,7 +73,11 @@ Future<String> _downloadBinary(String arch) async {
 Future<String> _downloadBinaryCached(String arch, String latestSha1) async {
   final localPath = (await getApplicationDocumentsDirectory()).path + '/$arch/$zippedFileName';
   final localSha1 = await _getSha1(localPath);
-  if (localSha1 == null) {
+  if (latestSha1 == null) {
+    // no internet
+    if (localSha1 == null) throw("No internet connection.");
+    return localPath;
+  } else if (localSha1 == null) {
     // file doesn't exist
     return _downloadBinary(arch);
   } else if (localSha1 == latestSha1) {

@@ -1,5 +1,11 @@
+import 'package:intl/intl.dart';
+
 abstract class AutoScalableVector {
   double getBestValue();
+
+  double getRawValue();
+
+  double scaleUse(String unit);
 
   String getBestUnit();
 }
@@ -11,13 +17,29 @@ class Temperature implements AutoScalableVector {
 
   @override
   String getBestUnit() {
-    return 'C';
+    return '°C';
   }
 
   @override
   double getBestValue() {
     return rawValue;
   }
+
+  @override
+  double getRawValue() {
+    return rawValue;
+  }
+
+  @override
+  double scaleUse(String unit) {
+    return rawValue;
+  }
+}
+
+enum _CompactFormatType {
+  COMPACT_DECIMAL_SHORT_PATTERN,
+  COMPACT_DECIMAL_LONG_PATTERN,
+  COMPACT_DECIMAL_SHORT_CURRENCY_PATTERN
 }
 
 class FileSize implements AutoScalableVector {
@@ -56,6 +78,28 @@ class FileSize implements AutoScalableVector {
       return rawValue / 1024.0 / 1024.0 / 1024.0 / 1024.0;
     }
   }
+
+  @override
+  double getRawValue() {
+    return rawValue;
+  }
+
+  @override
+  double scaleUse(String unit) {
+    if (unit == 'B' || unit == null) {
+      return rawValue;
+    } else if (unit == 'KB') {
+      return rawValue / 1024;
+    } else if (unit == 'MB') {
+      return rawValue / 1024 / 1024;
+    } else if (unit == 'GB') {
+      return rawValue / 1024 / 1024 / 1024;
+    } else if (unit == 'TB') {
+      return rawValue / 1024 / 1024 / 1024 / 1024;
+    } else {
+      throw ('Unkown unit: $unit');
+    }
+  }
 }
 
 class FileSizePerSecond implements AutoScalableVector {
@@ -71,6 +115,16 @@ class FileSizePerSecond implements AutoScalableVector {
   @override
   double getBestValue() {
     return fileSize.getBestValue();
+  }
+
+  @override
+  double getRawValue() {
+    return fileSize.getRawValue();
+  }
+
+  @override
+  double scaleUse(String unit) {
+    return fileSize.scaleUse(unit.substring(0, unit.length - 2));
   }
 }
 
@@ -96,6 +150,22 @@ class Frequency implements AutoScalableVector {
       return rawValue / 1000.0;
     }
   }
+
+  @override
+  double getRawValue() {
+    return rawValue;
+  }
+
+  @override
+  double scaleUse(String unit) {
+    if (unit == 'MHz' || unit == null) {
+      return rawValue;
+    } else if (unit == 'GHz') {
+      return rawValue / 1000;
+    } else {
+      throw ('Unkown unit: $unit');
+    }
+  }
 }
 
 class RawNumber implements AutoScalableVector {
@@ -113,6 +183,16 @@ class RawNumber implements AutoScalableVector {
   double getBestValue() {
     return rawValue;
   }
+
+  @override
+  double getRawValue() {
+    return rawValue;
+  }
+
+  @override
+  double scaleUse(String unit) {
+    return rawValue;
+  }
 }
 
 class Percentage implements AutoScalableVector {
@@ -127,6 +207,16 @@ class Percentage implements AutoScalableVector {
 
   @override
   double getBestValue() {
+    return rawValue;
+  }
+
+  @override
+  double getRawValue() {
+    return rawValue;
+  }
+
+  @override
+  double scaleUse(String unit) {
     return rawValue;
   }
 }

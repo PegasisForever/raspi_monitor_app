@@ -94,6 +94,7 @@ class MonitorData {
       ChartItem(
         name: 'Load',
         min: RawNumber(0, ''),
+        max: RawNumber(1, ''),
         lines: [
           Line(
             'Load1',
@@ -217,5 +218,19 @@ class ChartItem {
       min: min,
       lines: newLines,
     );
+  }
+
+  ChartDataPoint getMaxInView() {
+    ChartDataPoint max;
+    lines.forEach((line) {
+      line.data.forEach((d) {
+        if (max == null) {
+          max = d;
+        } else if (d.value.getRawValue() > max.value.getRawValue()) {
+          max = d;
+        }
+      });
+    });
+    return max;
   }
 }

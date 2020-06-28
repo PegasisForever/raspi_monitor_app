@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^0.1.3
   after_layout: ^1.0.7+2
   crypto: ^2.1.4
+  syncfusion_flutter_charts: ^18.1.59
 
 dev_dependencies:
   flutter_test:

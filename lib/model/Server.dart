@@ -26,10 +26,10 @@ class Server {
         privKey = map["privKey"],
         passphrase = map["passphrase"];
 
-  String getDisplayName(){
-    if(name!=null && name.isNotEmpty){
+  String getDisplayName() {
+    if (name != null && name.isNotEmpty) {
       return name;
-    }else{
+    } else {
       return ip;
     }
   }

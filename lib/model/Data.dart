@@ -94,7 +94,6 @@ class MonitorData {
       ChartItem(
         name: 'Load',
         min: RawNumber(0, ''),
-        max: RawNumber(1, ''),
         lines: [
           Line(
             'Load1',
@@ -113,7 +112,7 @@ class MonitorData {
       ChartItem(
         name: 'CPU Usage',
         min: Percentage(0),
-        max: Percentage(100),
+        max: Percentage(1),
         lines: [
           Line(
             'CPU Usage',

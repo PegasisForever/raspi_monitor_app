@@ -207,7 +207,7 @@ class Percentage implements AutoScalableVector {
 
   @override
   double getBestValue() {
-    return rawValue;
+    return rawValue * 100;
   }
 
   @override
@@ -217,6 +217,10 @@ class Percentage implements AutoScalableVector {
 
   @override
   double scaleUse(String unit) {
-    return rawValue;
+    if (unit == '%') {
+      return rawValue * 100;
+    } else {
+      return rawValue;
+    }
   }
 }

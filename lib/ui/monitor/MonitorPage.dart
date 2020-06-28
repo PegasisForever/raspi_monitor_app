@@ -43,7 +43,6 @@ class _MonitorPageState extends State<MonitorPage> {
       body: StreamBuilder(
         stream: dataMonitor.stream,
         builder: (context, AsyncSnapshot<List<ChartItem>> snapshot) {
-          print("build: $snapshot");
           if (snapshot.hasData) {
             return Padding(
               padding: EdgeInsets.all(16.0),

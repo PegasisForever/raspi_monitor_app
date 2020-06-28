@@ -101,6 +101,9 @@ Future<String> _getSftpSha1(SSHClient client) async {
 Future<void> _uploadBinary(SSHClient client, String path) async {
   await client.execute('mkdir -p $basePath');
   await client.sftpUpload(path: path, toPath: '$basePath');
+  try {
+    await client.execute('rm $basePath/$unzippedFileName');
+  } catch (e) {}
   await client.execute('gzip -d $basePath/$unzippedFileName');
 }
 

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:raspi_monitor_app/storage.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerListWidget.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerLongPressDialog.dart';
-import 'package:raspi_monitor_app/ui/monitor/ConnectDialog.dart';
+import 'package:raspi_monitor_app/ui/monitor/MonitorPage.dart';
 import 'package:raspi_monitor_app/ui/servereditpage/ServerEditPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,7 +24,10 @@ class _HomePageState extends State<HomePage> {
             return ServerListWidget(
               servers: snapshot.data,
               onTap: (server) async {
-                showDialog(context: context, builder: (_) => ConnectDialog(server: server));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => MonitorPage(server: server)),
+                );
               },
               onLongPress: (server) {
                 showDialog(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:raspi_monitor_app/model/Data.dart';
+import 'package:raspi_monitor_app/model/Server.dart';
 import 'package:raspi_monitor_app/ssh/sshTools.dart';
 import 'package:ssh/ssh.dart';
 
@@ -11,12 +12,13 @@ class DataMonitor {
   List<ChartItem> chartItems;
   Stream<List<ChartItem>> stream;
   SSHClient sshClient;
-  bool stopped = false;
+  Server server;
+  bool stopped;
 
-  DataMonitor(this.sshClient);
+  DataMonitor(this.server);
 
   void start() {
-    stopped = false;
+    if (stopped == true) throw ("Can't restart a stopped data monitor!");
     stream = _getStream();
   }
 
@@ -26,12 +28,14 @@ class DataMonitor {
 
   Stream<List<ChartItem>> _getStream() async* {
     try {
+      sshClient = await getSSHClient(server);
+      await uploadBinary(sshClient);
       while (true) {
         if (lastGetData != null) {
           final now = DateTime.now().millisecondsSinceEpoch;
           await Future.delayed(Duration(milliseconds: 1000 - (now - lastGetData)));
         }
-        if (stopped) return;
+        if (stopped == true) break;
         final rawData = getRawMonitorData(await getMonitorDataString(sshClient));
         lastGetData = rawData.time;
         oldRaw = newRaw;
@@ -47,9 +51,11 @@ class DataMonitor {
           yield chartItems;
         }
       }
+      await disconnectAll(sshClient);
     } catch (e, stacktrace) {
       print(e);
       print(stacktrace);
+      throw (e);
     }
   }
 }

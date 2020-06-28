@@ -75,7 +75,7 @@ Future<String> _downloadBinaryCached(String arch, String latestSha1) async {
   final localSha1 = await _getSha1(localPath);
   if (latestSha1 == null) {
     // no internet
-    if (localSha1 == null) throw("No internet connection.");
+    if (localSha1 == null) throw ("No internet connection.");
     return localPath;
   } else if (localSha1 == null) {
     // file doesn't exist
@@ -127,6 +127,8 @@ Future<String> getSysInfo(SSHClient client) async {
   return await client.execute('$basePath/raspi_monitor info');
 }
 
-Future<String> getMonitorInfo(SSHClient client) async {
-  return await client.execute('$basePath/raspi_monitor');
+final apiVersion = 1;
+
+Future<String> getMonitorDataString(SSHClient client) async {
+  return await client.execute('$basePath/raspi_monitor $apiVersion');
 }

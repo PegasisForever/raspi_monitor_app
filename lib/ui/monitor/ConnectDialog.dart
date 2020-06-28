@@ -1,7 +1,7 @@
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
-import 'package:raspi_monitor_app/sshTools.dart';
+import 'package:raspi_monitor_app/ssh/sshTools.dart';
 import 'package:raspi_monitor_app/ui/monitor/MonitorPage.dart';
 
 class ConnectDialog extends StatefulWidget {

@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:raspi_monitor_app/model/Data.dart';
+import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
-import 'package:raspi_monitor_app/sshTools.dart';
+import 'package:raspi_monitor_app/ssh/sshTools.dart';
 import 'package:ssh/ssh.dart';
 
 class MonitorPage extends StatefulWidget {
@@ -14,14 +18,18 @@ class MonitorPage extends StatefulWidget {
 }
 
 class _MonitorPageState extends State<MonitorPage> {
-  Future<String> getData(SSHClient client) async {
-    final sysInfo = await getSysInfo(client);
-    final monInfo = await getMonitorInfo(client);
-    return "$sysInfo\n$monInfo";
+  DataMonitor dataMonitor;
+
+  @override
+  void initState() {
+    dataMonitor = DataMonitor(widget.sshClient);
+    dataMonitor.start();
+    super.initState();
   }
 
   @override
   void dispose() {
+    dataMonitor.stop();
     disconnectAll(widget.sshClient);
     super.dispose();
   }
@@ -32,14 +40,15 @@ class _MonitorPageState extends State<MonitorPage> {
       appBar: AppBar(
         title: Text(widget.server.getDisplayName()),
       ),
-      body: FutureBuilder(
-        future: getData(widget.sshClient),
-        builder: (context, snapshot) {
+      body: StreamBuilder(
+        stream: dataMonitor.stream,
+        builder: (context, AsyncSnapshot<List<ChartItem>> snapshot) {
+          print("build: $snapshot");
           if (snapshot.hasData) {
             return Padding(
               padding: EdgeInsets.all(16.0),
               child: SingleChildScrollView(
-                child: Text(snapshot.data),
+                child: Text(snapshot.data.toString()),
               ),
             );
           } else {

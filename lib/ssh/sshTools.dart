@@ -10,11 +10,19 @@ final zippedFileName = 'raspi_monitor.gz';
 final unzippedFileName = 'raspi_monitor';
 
 Future<SSHClient> getSSHClient(Server server) async {
+  var passwordOrKey = server.password ??
+      {
+        'privateKey': server.privKey,
+      };
+  if (passwordOrKey is Map && server.passphrase != null) {
+    passwordOrKey['passphrase'] = server.passphrase;
+  }
+
   final client = SSHClient(
     host: server.ip,
     port: server.port,
     username: server.user,
-    passwordOrKey: server.password,
+    passwordOrKey: passwordOrKey,
   );
   await client.connect();
   return client;

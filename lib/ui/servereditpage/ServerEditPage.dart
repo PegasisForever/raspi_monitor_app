@@ -60,6 +60,32 @@ class _ServerEditPageState extends State<ServerEditPage> {
           IconButton(
             icon: Icon(Icons.check),
             onPressed: () {
+              if (userController.text.isEmpty) {
+                _showAlertDialog(context, 'The \'User\' field is empty!');
+                return;
+              } else if (addressController.text.isEmpty) {
+                _showAlertDialog(context, 'The \'Address\' field is empty!');
+                return;
+              } else if (portController.text.isEmpty) {
+                _showAlertDialog(context, 'The \'Port\' field is empty!');
+                return;
+              } else if (int.tryParse(portController.text) == null ||
+                  int.tryParse(portController.text) < 0 ||
+                  int.tryParse(portController.text) > 65535) {
+                _showAlertDialog(context, 'The \'Port\' field is not valid!');
+                return;
+              } else if (isUsePassword) {
+                if (passwordController.text.isEmpty) {
+                  _showAlertDialog(context, 'The \'Password\' field is empty!');
+                  return;
+                }
+              } else if (!isUsePassword) {
+                if (privateKey == null) {
+                  _showAlertDialog(context, 'Please provide a private key!');
+                  return;
+                }
+              }
+
               final server = Server(
                 addressController.text,
                 userController.text,
@@ -245,7 +271,8 @@ class _ServerEditPageState extends State<ServerEditPage> {
       return false;
     }
 
-    return content.startsWith('-----BEGIN RSA PRIVATE KEY-----') && content.endsWith('-----END RSA PRIVATE KEY-----');
+    return content.startsWith('-----BEGIN RSA PRIVATE KEY-----') &&
+        (content.endsWith('-----END RSA PRIVATE KEY-----\n') || content.endsWith('-----END RSA PRIVATE KEY-----'));
   }
 
   void _showAlertDialog(BuildContext context, String msg) {

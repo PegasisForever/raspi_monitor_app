@@ -71,15 +71,16 @@ class MonitorData {
   List<ChartItem> createChartItems() {
     final time = rawData.time;
     return [
-      ChartItem(
-        name: 'Temperature',
-        lines: [
-          Line(
-            'Temperature',
-            [ChartDataPoint(time, Temperature(rawData.cpuTemp))],
-          ),
-        ],
-      ),
+      if (rawData.cpuTemp != null)
+        ChartItem(
+          name: 'Temperature',
+          lines: [
+            Line(
+              'Temperature',
+              [ChartDataPoint(time, Temperature(rawData.cpuTemp))],
+            ),
+          ],
+        ),
       ChartItem(
         name: 'Memory',
         min: FileSize(0),
@@ -120,17 +121,18 @@ class MonitorData {
           ),
         ],
       ),
-      ChartItem(
-        name: 'CPU Frequency',
-        min: Frequency(rawData.cpuMinMhz),
-        max: Frequency(rawData.cpuMaxMhz),
-        lines: [
-          Line(
-            'CPU Frequency',
-            [ChartDataPoint(time, Frequency(rawData.cpuMhz))],
-          ),
-        ],
-      ),
+      if (rawData.cpuMhz != null)
+        ChartItem(
+          name: 'CPU Frequency',
+          min: Frequency(rawData.cpuMinMhz),
+          max: Frequency(rawData.cpuMaxMhz),
+          lines: [
+            Line(
+              'CPU Frequency',
+              [ChartDataPoint(time, Frequency(rawData.cpuMhz))],
+            ),
+          ],
+        ),
       ChartItem(
         name: 'Network',
         min: FileSizePerSecond(FileSize(0)),
@@ -161,22 +163,32 @@ class MonitorData {
 
   List<ChartItem> appendToChartItems(List<ChartItem> chartItems) {
     final time = rawData.time;
-    return <ChartItem>[
-      chartItems[0].append([ChartDataPoint(time, Temperature(rawData.cpuTemp))]),
-      chartItems[1].append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))]),
-      chartItems[2].append([
-        ChartDataPoint(time, RawNumber(rawData.load1, '')),
-        ChartDataPoint(time, RawNumber(rawData.load5, '')),
-        ChartDataPoint(time, RawNumber(rawData.load15, '')),
-      ]),
-      chartItems[3].append([ChartDataPoint(time, Percentage(cpuUsage))]),
-      chartItems[4].append([ChartDataPoint(time, Frequency(rawData.cpuMhz))]),
-      chartItems[5].append([
-        ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
-        ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
-      ]),
-      chartItems[6].append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))]),
-    ];
+    return chartItems.map((chartItem) {
+      if (chartItem.name == 'Temperature') {
+        return chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))]);
+      } else if (chartItem.name == 'Memory') {
+        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))]);
+      } else if (chartItem.name == 'Load') {
+        return chartItem.append([
+          ChartDataPoint(time, RawNumber(rawData.load1, '')),
+          ChartDataPoint(time, RawNumber(rawData.load5, '')),
+          ChartDataPoint(time, RawNumber(rawData.load15, '')),
+        ]);
+      } else if (chartItem.name == 'CPU Usage') {
+        return chartItem.append([ChartDataPoint(time, Percentage(cpuUsage))]);
+      } else if (chartItem.name == 'CPU Frequency') {
+        return chartItem.append([ChartDataPoint(time, Frequency(rawData.cpuMhz))]);
+      } else if (chartItem.name == 'Network') {
+        return chartItem.append([
+          ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
+          ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
+        ]);
+      } else if (chartItem.name == 'Disk Usage') {
+        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))]);
+      } else {
+        throw ("Unknown chart item name: ${chartItem.name}");
+      }
+    }).toList();
   }
 }
 

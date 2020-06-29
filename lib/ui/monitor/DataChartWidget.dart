@@ -33,6 +33,7 @@ class DataChartWidget extends StatelessWidget {
             primaryXAxis: DateTimeAxis(
               intervalType: DateTimeIntervalType.seconds,
               interval: 5,
+              rangePadding: ChartRangePadding.none,
               visibleMinimum: DateTime.fromMillisecondsSinceEpoch(start),
             ),
             primaryYAxis: NumericAxis(

@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
+import 'package:raspi_monitor_app/tools.dart';
 
 class ServerEditPage extends StatefulWidget {
   ServerEditPage({this.server});
@@ -16,6 +21,9 @@ class _ServerEditPageState extends State<ServerEditPage> {
   final portController = TextEditingController();
   final userController = TextEditingController();
   final passwordController = TextEditingController();
+  final passphraseController = TextEditingController();
+  bool isUsePassword = true;
+  String privateKey;
 
   @override
   void initState() {
@@ -25,6 +33,9 @@ class _ServerEditPageState extends State<ServerEditPage> {
       portController.text = widget.server.port.toString();
       userController.text = widget.server.user;
       passwordController.text = widget.server.password ?? "";
+    } else {
+      portController.text = '22';
+      userController.text = 'pi';
     }
     super.initState();
   }
@@ -36,6 +47,7 @@ class _ServerEditPageState extends State<ServerEditPage> {
     portController.dispose();
     userController.dispose();
     passwordController.dispose();
+    passphraseController.dispose();
     super.dispose();
   }
 
@@ -52,8 +64,10 @@ class _ServerEditPageState extends State<ServerEditPage> {
                 addressController.text,
                 userController.text,
                 int.parse(portController.text),
-                password: passwordController.text,
                 name: nickNameController.text,
+                password: isUsePassword ? passwordController.text : null,
+                privKey: isUsePassword ? null : privateKey,
+                passphrase: isUsePassword ? null : passphraseController.text,
               );
               Navigator.pop(context, server);
             },
@@ -72,44 +86,179 @@ class _ServerEditPageState extends State<ServerEditPage> {
                   filled: true,
                 ),
               ),
-              SizedBox(height: 8),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: "Address",
-                  filled: true,
-                ),
+              SizedBox(height: 16),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 4,
+                    child: TextField(
+                      controller: userController,
+                      decoration: InputDecoration(
+                        labelText: "User",
+                        filled: true,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Text('@'),
+                  ),
+                  Expanded(
+                    flex: 8,
+                    child: TextField(
+                      controller: addressController,
+                      decoration: InputDecoration(
+                        labelText: "Address",
+                        filled: true,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Text(':'),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: TextField(
+                      controller: portController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: "Port",
+                        filled: true,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              SizedBox(height: 8),
-              TextField(
-                controller: portController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Port",
-                  filled: true,
-                ),
+              SizedBox(height: 16),
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Authentication Method: ',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  DropdownButton<bool>(
+                    value: isUsePassword,
+                    onChanged: (newValue) {
+                      setState(() {
+                        isUsePassword = newValue;
+                      });
+                    },
+                    items: <DropdownMenuItem<bool>>[
+                      DropdownMenuItem<bool>(
+                        value: true,
+                        child: Text('Password'),
+                      ),
+                      DropdownMenuItem<bool>(
+                        value: false,
+                        child: Text('Private Key'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              SizedBox(height: 8),
-              TextField(
-                controller: userController,
-                decoration: InputDecoration(
-                  labelText: "User",
-                  filled: true,
+              SizedBox(height: 16),
+              if (isUsePassword)
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: "Password",
+                    filled: true,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  filled: true,
-                ),
-              ),
+              if (!isUsePassword)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TextField(
+                      controller: passphraseController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: "Passphrase (Optional)",
+                        filled: true,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        RaisedButton(
+                          child: Text('Choose a File'),
+                          onPressed: () async {
+                            final filePath = await FilePicker.getFilePath(type: FileType.any);
+                            final file = File(filePath);
+                            if (!await _isValidKey(file)) {
+                              _showAlertDialog(
+                                context,
+                                'File \'${file.path.split('/').last}\' is not a valid private key.',
+                              );
+                              return;
+                            }
+                            final privateKey = await file.readAsString();
+                            setState(() {
+                              this.privateKey = privateKey;
+                            });
+                          },
+                        ),
+                        Text('or'),
+                        RaisedButton(
+                          child: Text('Paste from Clipboard'),
+                          onPressed: () async {
+                            final clipboardText = (await Clipboard.getData('text/plain')).text;
+                            if (!await _isValidKey(clipboardText)) {
+                              _showAlertDialog(
+                                context,
+                                '\'${shrinkText(clipboardText, 10)}\' is not a valid private key.',
+                              );
+                              return;
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    if (privateKey != null) Text(privateKey.substring(0, 50) + '.....'),
+                  ],
+                )
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<bool> _isValidKey(key) async {
+    String content;
+    if (key is File) {
+      if (await key.length() > 10240) {
+        return false;
+      }
+      content = await key.readAsString();
+    } else if (key is String) {
+      content = key;
+    } else {
+      return false;
+    }
+
+    return content.startsWith('-----BEGIN RSA PRIVATE KEY-----') && content.endsWith('-----END RSA PRIVATE KEY-----');
+  }
+
+  void _showAlertDialog(BuildContext context, String msg) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(msg),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            ));
   }
 }

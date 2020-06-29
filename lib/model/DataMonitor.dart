@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
 import 'package:raspi_monitor_app/ssh/sshTools.dart';

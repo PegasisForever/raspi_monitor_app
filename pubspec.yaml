@@ -33,6 +33,7 @@ dependencies:
   crypto: ^2.1.4
   syncfusion_flutter_charts: ^18.1.59
   intl: ^0.16.1
+  file_picker: ^1.10.0 # todo ios setup https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup#--ios
 
 dev_dependencies:
   flutter_test:

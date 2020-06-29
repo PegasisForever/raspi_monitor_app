@@ -17,13 +17,11 @@ Future<SSHClient> getSSHClient(Server server) async {
     passwordOrKey: server.password,
   );
   await client.connect();
-  await client.connectSFTP();
   return client;
 }
 
 Future<void> disconnectAll(SSHClient client) async {
   await client.disconnect();
-  client.disconnectSFTP();
 }
 
 Future<String> _getArch(SSHClient client) async {
@@ -100,7 +98,9 @@ Future<String> _getSftpSha1(SSHClient client) async {
 
 Future<void> _uploadBinary(SSHClient client, String path) async {
   await client.execute('mkdir -p $basePath');
+  await client.connectSFTP();
   await client.sftpUpload(path: path, toPath: '$basePath');
+  client.disconnectSFTP();
   try {
     await client.execute('rm $basePath/$unzippedFileName');
   } catch (e) {}

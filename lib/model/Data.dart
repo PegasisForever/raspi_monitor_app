@@ -165,26 +165,26 @@ class MonitorData {
     final time = rawData.time;
     return chartItems.map((chartItem) {
       if (chartItem.name == 'Temperature') {
-        return chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))]);
+        return chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))], time);
       } else if (chartItem.name == 'Memory') {
-        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))]);
+        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))], time);
       } else if (chartItem.name == 'Load') {
         return chartItem.append([
           ChartDataPoint(time, RawNumber(rawData.load1, '')),
           ChartDataPoint(time, RawNumber(rawData.load5, '')),
           ChartDataPoint(time, RawNumber(rawData.load15, '')),
-        ]);
+        ], time);
       } else if (chartItem.name == 'CPU Usage') {
-        return chartItem.append([ChartDataPoint(time, Percentage(cpuUsage))]);
+        return chartItem.append([ChartDataPoint(time, Percentage(cpuUsage))], time);
       } else if (chartItem.name == 'CPU Frequency') {
-        return chartItem.append([ChartDataPoint(time, Frequency(rawData.cpuMhz))]);
+        return chartItem.append([ChartDataPoint(time, Frequency(rawData.cpuMhz))], time);
       } else if (chartItem.name == 'Network') {
         return chartItem.append([
           ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
           ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
-        ]);
+        ], time);
       } else if (chartItem.name == 'Disk Usage') {
-        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))]);
+        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))], time);
       } else {
         throw ("Unknown chart item name: ${chartItem.name}");
       }
@@ -205,7 +205,15 @@ class Line {
 
   Line(this.name, this.data);
 
-  Line append(ChartDataPoint dataPoint) {
+  Line append(ChartDataPoint dataPoint, int time) {
+    final List<ChartDataPoint> newList = List.from(data)..add(dataPoint);
+    while (newList.isNotEmpty) {
+      if (newList[0].time < (time - 1000 * 60)) {
+        newList.removeAt(0);
+      } else {
+        break;
+      }
+    }
     return Line(name, List.from(data)..add(dataPoint));
   }
 }
@@ -218,10 +226,10 @@ class ChartItem {
 
   ChartItem({this.name, this.min, this.max, this.lines});
 
-  ChartItem append(List<ChartDataPoint> dataPoints) {
+  ChartItem append(List<ChartDataPoint> dataPoints, int time) {
     final newLines = <Line>[];
     for (var i = 0; i < lines.length; i++) {
-      newLines.add(lines[i].append(dataPoints[i]));
+      newLines.add(lines[i].append(dataPoints[i], time));
     }
     return ChartItem(
       name: name,

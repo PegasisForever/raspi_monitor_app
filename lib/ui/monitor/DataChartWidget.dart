@@ -34,6 +34,7 @@ class DataChartWidget extends StatelessWidget {
               intervalType: DateTimeIntervalType.seconds,
               interval: 5,
               rangePadding: ChartRangePadding.none,
+              labelStyle: ChartTextStyle(fontSize: 0),
               visibleMinimum: DateTime.fromMillisecondsSinceEpoch(start),
             ),
             primaryYAxis: NumericAxis(

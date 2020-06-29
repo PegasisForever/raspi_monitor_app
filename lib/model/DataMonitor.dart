@@ -33,11 +33,15 @@ class DataMonitor {
       while (true) {
         if (lastGetData != null) {
           final now = DateTime.now().millisecondsSinceEpoch;
-          await Future.delayed(Duration(milliseconds: 1000 - (now - lastGetData)));
+          final waitMillis = 1000 - (now - lastGetData);
+          if (waitMillis > 0) {
+            await Future.delayed(Duration(milliseconds: waitMillis));
+          }
         }
+        lastGetData = DateTime.now().millisecondsSinceEpoch;
+
         if (stopped == true) break;
         final rawData = getRawMonitorData(await getMonitorDataString(sshClient));
-        lastGetData = rawData.time;
         oldRaw = newRaw;
         newRaw = rawData;
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';

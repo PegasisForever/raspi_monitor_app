@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/Server.dart';
 
@@ -34,4 +35,10 @@ Future<void> updateServer(Server oldServer, Server newServer) async {
 Future<void> _saveList() async {
   final jsonStr = json.encode(_lastGetServerList.map((server) => server.toJson()).toList());
   await secureStorage.write(key: 'server_list', value: jsonStr);
+}
+
+SharedPreferences prefs;
+
+Future<void> initSharedPrefs() async {
+  prefs = await SharedPreferences.getInstance();
 }

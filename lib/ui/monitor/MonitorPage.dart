@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
+import 'package:raspi_monitor_app/storage.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataChartList.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataGrid.dart';
 
@@ -18,7 +19,7 @@ class MonitorPage extends StatefulWidget {
 
 class _MonitorPageState extends State<MonitorPage> {
   DataMonitor dataMonitor;
-  bool isChart = true;
+  bool isChart = prefs.getBool("prefer_chart") ?? true;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _MonitorPageState extends State<MonitorPage> {
             onPressed: () {
               setState(() {
                 isChart = !isChart;
+                prefs.setBool("prefer_chart", isChart);
               });
             },
           )

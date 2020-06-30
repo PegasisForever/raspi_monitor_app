@@ -15,6 +15,8 @@ class RawMonitorData {
   final double cpuTemp; // C
   final double memUsed; // KB
   final double memTotal; // KB
+  final double swapUsed; // KB
+  final double swapTotal; // KB
   final double load1;
   final double load5;
   final double load15;
@@ -25,6 +27,8 @@ class RawMonitorData {
   final double cpuMinMhz; // Mhz
   final double receivedBytes; // Byte
   final double sentBytes; // Byte
+  final double diskRead; // KB
+  final double diskWrite; // KB
   final double rootUsed; // KB
   final double rootTotal; // KB
   final int time; // millisecond
@@ -33,6 +37,8 @@ class RawMonitorData {
       : cpuTemp = json["cpu_temp"]?.toDouble(),
         memUsed = json["mem_used_kb"]?.toDouble(),
         memTotal = json["mem_total_kb"]?.toDouble(),
+        swapUsed = json["swap_used_kb"]?.toDouble(),
+        swapTotal = json["swap_total_kb"]?.toDouble(),
         load1 = json["load_1"]?.toDouble(),
         load5 = json["load_5"]?.toDouble(),
         load15 = json["load_15"]?.toDouble(),
@@ -45,6 +51,8 @@ class RawMonitorData {
         sentBytes = json["sent_bytes"]?.toDouble(),
         rootUsed = json["root_used_kb"]?.toDouble(),
         rootTotal = json["root_total_kb"]?.toDouble(),
+        diskRead = json["total_disk_read_kb"]?.toDouble(),
+        diskWrite = json["total_disk_read_kb"]?.toDouble(),
         time = json["time"];
 }
 
@@ -53,18 +61,32 @@ class MonitorData {
   final double cpuUsage; // percentage
   final double networkUpSpeed; // Byte/s
   final double networkDownSpeed; // Byte/s
+  final double diskWriteSpeed; // KB/s
+  final double diskReadSpeed; // KB/s
 
-  MonitorData._(this.rawData, this.cpuUsage, this.networkUpSpeed, this.networkDownSpeed);
+  MonitorData._(
+    this.rawData,
+    this.cpuUsage,
+    this.networkUpSpeed,
+    this.networkDownSpeed,
+    this.diskWriteSpeed,
+    this.diskReadSpeed,
+  );
 
   factory MonitorData(RawMonitorData oldRaw, RawMonitorData newRaw) {
     final interval = (newRaw.time - oldRaw.time) / 1000.0;
     final cpuIdleTime = newRaw.cpuIdleTime - oldRaw.cpuIdleTime;
     final cpuTotalTime = newRaw.cpuTotalTime - oldRaw.cpuTotalTime;
+    final diskWritten = newRaw.diskWrite - oldRaw.diskWrite;
+    final diskRead = newRaw.diskRead - oldRaw.diskRead;
+
     return MonitorData._(
       newRaw,
       1.0 - (cpuIdleTime / cpuTotalTime),
       (newRaw.sentBytes - oldRaw.sentBytes) / interval,
       (newRaw.receivedBytes - oldRaw.receivedBytes) / interval,
+      diskWritten / interval,
+      diskRead / interval,
     );
   }
 
@@ -89,6 +111,17 @@ class MonitorData {
           Line(
             'Memory',
             [ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))],
+          ),
+        ],
+      ),
+      ChartItem(
+        name: 'Swap',
+        min: FileSize(0),
+        max: FileSize.fromKB(rawData.swapTotal),
+        lines: [
+          Line(
+            'Swap',
+            [ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))],
           ),
         ],
       ),
@@ -148,6 +181,20 @@ class MonitorData {
         ],
       ),
       ChartItem(
+        name: 'Disk IO',
+        min: FileSizePerSecond(FileSize(0)),
+        lines: [
+          Line(
+            'Read',
+            [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed)))],
+          ),
+          Line(
+            'Write',
+            [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed)))],
+          ),
+        ],
+      ),
+      ChartItem(
         name: 'Disk Usage',
         min: FileSize(0),
         max: FileSize.fromKB(rawData.rootTotal),
@@ -168,6 +215,8 @@ class MonitorData {
         return chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))], time);
       } else if (chartItem.name == 'Memory') {
         return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))], time);
+      } else if (chartItem.name == 'Swap') {
+        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))], time);
       } else if (chartItem.name == 'Load') {
         return chartItem.append([
           ChartDataPoint(time, RawNumber(rawData.load1, '')),
@@ -182,6 +231,11 @@ class MonitorData {
         return chartItem.append([
           ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
           ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
+        ], time);
+      } else if (chartItem.name == 'Disk IO') {
+        return chartItem.append([
+          ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed))),
+          ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed))),
         ], time);
       } else if (chartItem.name == 'Disk Usage') {
         return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))], time);

@@ -32,6 +32,7 @@ class DataChartWidget extends StatelessWidget {
           child: SfCartesianChart(
             primaryXAxis: DateTimeAxis(
               intervalType: DateTimeIntervalType.seconds,
+              tickPosition: TickPosition.inside,
               interval: 5,
               rangePadding: ChartRangePadding.none,
               labelStyle: ChartTextStyle(fontSize: 0),

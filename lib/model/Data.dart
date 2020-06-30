@@ -302,4 +302,8 @@ class ChartItem {
     });
     return max;
   }
+
+  ChartDataPoint getLatest(int lineIndex){
+    return lines[lineIndex].data.last;
+  }
 }

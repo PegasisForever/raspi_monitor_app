@@ -5,7 +5,6 @@ import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataChartList.dart';
-import 'package:raspi_monitor_app/ui/monitor/DataChartWidget.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataGrid.dart';
 
 class MonitorPage extends StatefulWidget {

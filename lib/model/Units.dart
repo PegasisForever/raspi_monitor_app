@@ -8,7 +8,11 @@ abstract class AutoScalableVector {
   double scaleUse(String unit);
 
   String getBestUnit();
+
+  String toBestString();
 }
+
+final _format = NumberFormat("####.#");
 
 class Temperature implements AutoScalableVector {
   final double rawValue; // C
@@ -34,12 +38,11 @@ class Temperature implements AutoScalableVector {
   double scaleUse(String unit) {
     return rawValue;
   }
-}
 
-enum _CompactFormatType {
-  COMPACT_DECIMAL_SHORT_PATTERN,
-  COMPACT_DECIMAL_LONG_PATTERN,
-  COMPACT_DECIMAL_SHORT_CURRENCY_PATTERN
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
+  }
 }
 
 class FileSize implements AutoScalableVector {
@@ -100,6 +103,11 @@ class FileSize implements AutoScalableVector {
       throw ('Unkown unit: $unit');
     }
   }
+
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
+  }
 }
 
 class FileSizePerSecond implements AutoScalableVector {
@@ -125,6 +133,11 @@ class FileSizePerSecond implements AutoScalableVector {
   @override
   double scaleUse(String unit) {
     return fileSize.scaleUse(unit.substring(0, unit.length - 2));
+  }
+
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
   }
 }
 
@@ -166,6 +179,11 @@ class Frequency implements AutoScalableVector {
       throw ('Unkown unit: $unit');
     }
   }
+
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
+  }
 }
 
 class RawNumber implements AutoScalableVector {
@@ -192,6 +210,11 @@ class RawNumber implements AutoScalableVector {
   @override
   double scaleUse(String unit) {
     return rawValue;
+  }
+
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
   }
 }
 
@@ -222,5 +245,10 @@ class Percentage implements AutoScalableVector {
     } else {
       return rawValue;
     }
+  }
+
+  @override
+  String toBestString() {
+    return _format.format(getBestValue()) + getBestUnit();
   }
 }

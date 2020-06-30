@@ -16,6 +16,39 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: <Widget>[
           ListTile(
+            title: Text('Dashboard Style'),
+            trailing: DropdownButton<bool>(
+              value: prefs.getBool("prefer_chart") ?? true,
+              onChanged: (newValue) {
+                setState(() {
+                  prefs.setBool("prefer_chart", newValue);
+                });
+              },
+              items: <DropdownMenuItem<bool>>[
+                DropdownMenuItem<bool>(
+                  value: true,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.trending_up),
+                      SizedBox(width: 8),
+                      Text('Chart'),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem<bool>(
+                  value: false,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.dashboard),
+                      SizedBox(width: 8),
+                      Text('Grid'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
             title: Text('About'),
             onTap: () {
               showDialog(

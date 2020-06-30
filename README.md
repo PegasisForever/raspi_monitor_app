@@ -12,7 +12,7 @@ Prerelease download link: [https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ](https:/
 ## How does this work?
 
 1. Upload [Raspberry Pi Monitor](https://github.com/PegasisForever/raspi_monitor) binary to the rpi `/var/tmp/` by sftp.
-2. Use ssh to run that binary every minute to get data.
+2. Use ssh to run that binary every second to get data.
 
 ## Compile Release
 

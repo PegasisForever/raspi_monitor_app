@@ -119,6 +119,7 @@ class _ServerEditPageState extends State<ServerEditPage> {
                     flex: 4,
                     child: TextField(
                       controller: userController,
+                      keyboardType: TextInputType.visiblePassword,
                       decoration: InputDecoration(
                         labelText: "User",
                         filled: true,
@@ -133,6 +134,7 @@ class _ServerEditPageState extends State<ServerEditPage> {
                     flex: 8,
                     child: TextField(
                       controller: addressController,
+                      keyboardType: TextInputType.visiblePassword,
                       decoration: InputDecoration(
                         labelText: "Address",
                         filled: true,
@@ -147,7 +149,7 @@ class _ServerEditPageState extends State<ServerEditPage> {
                     flex: 3,
                     child: TextField(
                       controller: portController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(signed: false, decimal: false),
                       decoration: InputDecoration(
                         labelText: "Port",
                         filled: true,

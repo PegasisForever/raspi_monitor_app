@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/Server.dart';
@@ -41,4 +42,10 @@ SharedPreferences prefs;
 
 Future<void> initSharedPrefs() async {
   prefs = await SharedPreferences.getInstance();
+}
+
+PackageInfo packageInfo;
+
+Future<void> initPackageInfo() async {
+  packageInfo = await PackageInfo.fromPlatform();
 }

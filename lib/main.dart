@@ -7,7 +7,8 @@ import 'package:syncfusion_flutter_core/core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SyncfusionLicense.registerLicense(SyncfusionCommunityLicenceKey);
-  await initSharedPrefs();
+  initSharedPrefs();
+  initPackageInfo();
   runApp(MyApp());
 }
 

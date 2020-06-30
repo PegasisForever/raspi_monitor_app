@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="raspi_monitor_app"
+        android:label="Raspberry Pi Monitor"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/storage.dart';
+import 'package:raspi_monitor_app/ui/SettingsPage.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerListWidget.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerLongPressDialog.dart';
 import 'package:raspi_monitor_app/ui/monitor/MonitorPage.dart';
@@ -16,6 +17,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Raspberry Pi Monitor'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SettingsPage()),
+              );
+            },
+          )
+        ],
       ),
       body: FutureBuilder(
         future: getServerList(),

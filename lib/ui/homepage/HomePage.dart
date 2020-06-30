@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/storage.dart';
-import 'package:raspi_monitor_app/ui/SettingsPage.dart';
+import 'package:raspi_monitor_app/ui/settings/SettingsPage.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerListWidget.dart';
 import 'package:raspi_monitor_app/ui/homepage/ServerLongPressDialog.dart';
 import 'package:raspi_monitor_app/ui/monitor/MonitorPage.dart';

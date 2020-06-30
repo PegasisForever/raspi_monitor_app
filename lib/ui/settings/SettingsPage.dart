@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide AboutDialog;
 import 'package:raspi_monitor_app/storage.dart';
+import 'package:raspi_monitor_app/ui/settings/AboutDialog.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -52,11 +53,9 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text('About'),
             onTap: () {
               showDialog(
-                  context: context,
-                  builder: (context) => AboutDialog(
-                        applicationName: 'Raspberry Pi Monitor',
-                        applicationVersion: 'Prerelease ${packageInfo.version} (${packageInfo.buildNumber})',
-                      ));
+                context: context,
+                builder: (context) => AboutDialog(),
+              );
             },
           ),
         ],

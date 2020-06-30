@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
+import 'package:raspi_monitor_app/ssh/sshTools.dart';
 import 'package:raspi_monitor_app/tools.dart';
 
 class ServerEditPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _ServerEditPageState extends State<ServerEditPage> {
   final passwordController = TextEditingController();
   final passphraseController = TextEditingController();
   bool isUsePassword = true;
+  bool isChecking = false;
   String privateKey;
 
   @override
@@ -33,6 +35,9 @@ class _ServerEditPageState extends State<ServerEditPage> {
       portController.text = widget.server.port.toString();
       userController.text = widget.server.user;
       passwordController.text = widget.server.password ?? "";
+      isUsePassword = widget.server.password?.isNotEmpty ?? false;
+      privateKey = widget.server.privKey;
+      passphraseController.text = widget.server.passphrase ?? "";
     } else {
       portController.text = '22';
       userController.text = 'pi';
@@ -51,53 +56,114 @@ class _ServerEditPageState extends State<ServerEditPage> {
     super.dispose();
   }
 
+  Server _createServer(BuildContext context) {
+    if (userController.text.isEmpty) {
+      _showAlertDialog(context, 'The \'User\' field is empty!');
+      return null;
+    } else if (addressController.text.isEmpty) {
+      _showAlertDialog(context, 'The \'Address\' field is empty!');
+      return null;
+    } else if (portController.text.isEmpty) {
+      _showAlertDialog(context, 'The \'Port\' field is empty!');
+      return null;
+    } else if (int.tryParse(portController.text) == null ||
+        int.tryParse(portController.text) < 0 ||
+        int.tryParse(portController.text) > 65535) {
+      _showAlertDialog(context, 'The \'Port\' field is not valid!');
+      return null;
+    } else if (isUsePassword) {
+      if (passwordController.text.isEmpty) {
+        _showAlertDialog(context, 'The \'Password\' field is empty!');
+        return null;
+      }
+    } else if (!isUsePassword) {
+      if (privateKey == null) {
+        _showAlertDialog(context, 'Please provide a private key!');
+        return null;
+      }
+    }
+
+    return Server(
+      addressController.text,
+      userController.text,
+      int.parse(portController.text),
+      name: nickNameController.text,
+      password: isUsePassword ? passwordController.text : null,
+      privKey: isUsePassword ? null : privateKey,
+      passphrase: isUsePassword ? null : passphraseController.text,
+    );
+  }
+
+  Future<Exception> _checkServer(BuildContext context, Server server) async {
+    if (server == null) return null;
+    try {
+      final client = await getSSHClient(server);
+      disconnectAll(client);
+      return null;
+    } catch (e) {
+      return e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.server == null ? 'New Server' : 'Edit Server'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () {
-              if (userController.text.isEmpty) {
-                _showAlertDialog(context, 'The \'User\' field is empty!');
-                return;
-              } else if (addressController.text.isEmpty) {
-                _showAlertDialog(context, 'The \'Address\' field is empty!');
-                return;
-              } else if (portController.text.isEmpty) {
-                _showAlertDialog(context, 'The \'Port\' field is empty!');
-                return;
-              } else if (int.tryParse(portController.text) == null ||
-                  int.tryParse(portController.text) < 0 ||
-                  int.tryParse(portController.text) > 65535) {
-                _showAlertDialog(context, 'The \'Port\' field is not valid!');
-                return;
-              } else if (isUsePassword) {
-                if (passwordController.text.isEmpty) {
-                  _showAlertDialog(context, 'The \'Password\' field is empty!');
-                  return;
-                }
-              } else if (!isUsePassword) {
-                if (privateKey == null) {
-                  _showAlertDialog(context, 'Please provide a private key!');
-                  return;
-                }
-              }
+          if (!isChecking)
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () async {
+                setState(() {
+                  isChecking = true;
+                });
 
-              final server = Server(
-                addressController.text,
-                userController.text,
-                int.parse(portController.text),
-                name: nickNameController.text,
-                password: isUsePassword ? passwordController.text : null,
-                privKey: isUsePassword ? null : privateKey,
-                passphrase: isUsePassword ? null : passphraseController.text,
-              );
-              Navigator.pop(context, server);
-            },
-          ),
+                final server = _createServer(context);
+                final e = await _checkServer(context, server);
+                if (server != null && e == null) {
+                  Navigator.pop(context, server);
+                } else {
+                  setState(() {
+                    isChecking = false;
+                  });
+
+                  final forceAdd = await showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => AlertDialog(
+                            title: Text("Unable to connect to ${server.getDisplayName()}"),
+                            content: Text(e.toString()),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Save It Anyway'),
+                                onPressed: () => Navigator.pop(context, true),
+                              ),
+                              FlatButton(
+                                child: Text('Cancel'),
+                                onPressed: () => Navigator.pop(context, false),
+                              ),
+                            ],
+                          ));
+
+                  if (forceAdd) {
+                    Navigator.pop(context, server);
+                  }
+                }
+              },
+            ),
+          if (isChecking)
+            Stack(
+              alignment: Alignment(0, 0),
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              ],
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -277,11 +343,12 @@ class _ServerEditPageState extends State<ServerEditPage> {
         (content.endsWith('-----END RSA PRIVATE KEY-----\n') || content.endsWith('-----END RSA PRIVATE KEY-----'));
   }
 
-  void _showAlertDialog(BuildContext context, String msg) {
-    showDialog(
+  Future<void> _showAlertDialog(BuildContext context, String msg, {String text}) {
+    return showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: Text(msg),
+              content: text != null ? Text(text) : null,
               actions: <Widget>[
                 FlatButton(
                   child: Text('OK'),

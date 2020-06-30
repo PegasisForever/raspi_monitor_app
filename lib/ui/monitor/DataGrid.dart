@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/model/Data.dart';
 
 class DataCard extends StatelessWidget {
-  DataCard({this.title, this.text = 'N/A', this.maxLines = 1});
+  DataCard({this.title, this.text, this.maxLines = 1});
 
   final String title;
   final String text;
@@ -28,7 +28,7 @@ class DataCard extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: AutoSizeText(
-                    text,
+                    text ?? 'N/A',
                     maxLines: maxLines,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -81,11 +81,11 @@ class DataGrid extends StatelessWidget {
               children: <Widget>[
                 DataCard(
                   title: "CPU Frequency",
-                  text: chartItems['CPU Frequency'].getLatest(0).value.toBestString(),
+                  text: chartItems['CPU Frequency']?.getLatest(0)?.value?.toBestString(),
                 ),
                 DataCard(
                   title: "Temperature",
-                  text: chartItems['Temperature'].getLatest(0).value.toBestString(),
+                  text: chartItems['Temperature']?.getLatest(0)?.value?.toBestString(),
                 ),
               ],
             ),

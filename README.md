@@ -1,16 +1,21 @@
-# raspi_monitor_app
+# Raspberry Pi Monitor App
 
-Raspberry Monitor
+(Theoretically it should work on any arm/x86 linux machine, but I can't guarantee.)
 
-## Getting Started
+Prerelease download link: [https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ](https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ)
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- Zero setup
+- Nothing will be installed on the raspberry pi
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## How does this work?
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Upload [Raspberry Pi Monitor](https://github.com/PegasisForever/raspi_monitor) binary to the rpi `/var/tmp/` by sftp.
+2. Use ssh to run that binary every minute to get data.
+
+## Compile Release
+
+```
+flutter build apk --target-platform android-arm64,android-arm --split-per-abi --no-shrink
+```

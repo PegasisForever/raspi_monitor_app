@@ -4,6 +4,13 @@
 
 Prerelease download link: [https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ](https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ)
 
+## Screenshots
+
+![](https://cloud.pegasis.site/s/Sj4EKD2p5t2LBS3/preview)
+![](https://cloud.pegasis.site/s/yX48mbrQxk68xsG/preview)
+![](https://cloud.pegasis.site/s/rWz9HrAeiC3j4tZ/preview)
+![](https://cloud.pegasis.site/s/BM6Y8Y7RBjySCkQ/preview)
+
 ## Features
 
 - Zero setup

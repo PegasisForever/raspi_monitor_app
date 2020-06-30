@@ -32,7 +32,7 @@ class AboutDialog extends StatelessWidget {
                       Text('${packageInfo.version} (${packageInfo.buildNumber})'),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),

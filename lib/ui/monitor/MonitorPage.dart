@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
+import 'package:raspi_monitor_app/ui/monitor/DataChartList.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataChartWidget.dart';
+import 'package:raspi_monitor_app/ui/monitor/DataGrid.dart';
 
 class MonitorPage extends StatefulWidget {
   const MonitorPage({this.server});
@@ -17,6 +19,7 @@ class MonitorPage extends StatefulWidget {
 
 class _MonitorPageState extends State<MonitorPage> {
   DataMonitor dataMonitor;
+  bool isChart = true;
 
   @override
   void initState() {
@@ -36,10 +39,20 @@ class _MonitorPageState extends State<MonitorPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.server.getDisplayName()),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(isChart ? Icons.dashboard : Icons.trending_up),
+            onPressed: () {
+              setState(() {
+                isChart = !isChart;
+              });
+            },
+          )
+        ],
       ),
       body: StreamBuilder(
         stream: dataMonitor.stream,
-        builder: (context, AsyncSnapshot<List<ChartItem>> snapshot) {
+        builder: (context, AsyncSnapshot<Map<String, ChartItem>> snapshot) {
           if (snapshot.hasError) {
             Future.delayed(
                 Duration.zero,
@@ -61,6 +74,14 @@ class _MonitorPageState extends State<MonitorPage> {
                         )));
             return Container();
           } else {
+            Widget mainContent;
+            if (!snapshot.hasData) {
+              mainContent = Container();
+            } else if (isChart) {
+              mainContent = DataChartList(snapshot.data);
+            } else if (!isChart) {
+              mainContent = DataGrid(snapshot.data);
+            }
             return Stack(
               children: <Widget>[
                 AnimatedOpacity(
@@ -83,15 +104,7 @@ class _MonitorPageState extends State<MonitorPage> {
                 AnimatedOpacity(
                   duration: Duration(milliseconds: 300),
                   opacity: snapshot.hasData ? 1 : 0,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(top: 4),
-                    itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (BuildContext context, i) {
-                      return DataChartWidget(snapshot.data[i]);
-                    },
-                    separatorBuilder: (_, __) => Divider(),
-                  ),
+                  child: mainContent,
                 ),
               ],
             );

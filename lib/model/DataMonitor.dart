@@ -7,8 +7,8 @@ class DataMonitor {
   RawMonitorData oldRaw;
   RawMonitorData newRaw;
   int lastGetData;
-  List<ChartItem> chartItems;
-  Stream<List<ChartItem>> stream;
+  Map<String, ChartItem> chartItems;
+  Stream<Map<String, ChartItem>> stream;
   SSHClient sshClient;
   Server server;
   bool stopped;
@@ -24,7 +24,7 @@ class DataMonitor {
     stopped = true;
   }
 
-  Stream<List<ChartItem>> _getStream() async* {
+  Stream<Map<String, ChartItem>> _getStream() async* {
     try {
       sshClient = await getSSHClient(server);
       await uploadBinary(sshClient);

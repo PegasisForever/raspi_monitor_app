@@ -90,159 +90,157 @@ class MonitorData {
     );
   }
 
-  List<ChartItem> createChartItems() {
+  Map<String, ChartItem> createChartItems() {
     final time = rawData.time;
-    return [
-      if (rawData.cpuTemp != null)
-        ChartItem(
-          name: 'Temperature',
-          lines: [
-            Line(
-              'Temperature',
-              [ChartDataPoint(time, Temperature(rawData.cpuTemp))],
-            ),
-          ],
+    final Map<String, ChartItem> map = {};
+    if (rawData.cpuTemp != null)
+      map['Temperature'] = ChartItem(
+        lines: [
+          Line(
+            'Temperature',
+            [ChartDataPoint(time, Temperature(rawData.cpuTemp))],
+          ),
+        ],
+      );
+    map['Memory'] = ChartItem(
+      min: FileSize(0),
+      max: FileSize.fromKB(rawData.memTotal),
+      lines: [
+        Line(
+          'Memory',
+          [ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))],
         ),
-      ChartItem(
-        name: 'Memory',
-        min: FileSize(0),
-        max: FileSize.fromKB(rawData.memTotal),
-        lines: [
-          Line(
-            'Memory',
-            [ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))],
-          ),
-        ],
-      ),
-      ChartItem(
-        name: 'Swap',
-        min: FileSize(0),
-        max: FileSize.fromKB(rawData.swapTotal),
-        lines: [
-          Line(
-            'Swap',
-            [ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))],
-          ),
-        ],
-      ),
-      ChartItem(
-        name: 'Load',
-        min: RawNumber(0, ''),
-        lines: [
-          Line(
-            'Load1',
-            [ChartDataPoint(time, RawNumber(rawData.load1, ''))],
-          ),
-          Line(
-            'Load5',
-            [ChartDataPoint(time, RawNumber(rawData.load5, ''))],
-          ),
-          Line(
-            'Load15',
-            [ChartDataPoint(time, RawNumber(rawData.load15, ''))],
-          ),
-        ],
-      ),
-      ChartItem(
-        name: 'CPU Usage',
-        min: Percentage(0),
-        max: Percentage(1),
-        lines: [
-          Line(
-            'CPU Usage',
-            [ChartDataPoint(time, Percentage(cpuUsage))],
-          ),
-        ],
-      ),
-      if (rawData.cpuMhz != null)
-        ChartItem(
-          name: 'CPU Frequency',
-          min: Frequency(rawData.cpuMinMhz),
-          max: Frequency(rawData.cpuMaxMhz),
-          lines: [
-            Line(
-              'CPU Frequency',
-              [ChartDataPoint(time, Frequency(rawData.cpuMhz))],
-            ),
-          ],
+      ],
+    );
+    map['Swap'] = ChartItem(
+      min: FileSize(0),
+      max: FileSize.fromKB(rawData.swapTotal),
+      lines: [
+        Line(
+          'Swap',
+          [ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))],
         ),
-      ChartItem(
-        name: 'Network',
-        min: FileSizePerSecond(FileSize(0)),
+      ],
+    );
+    map['Load'] = ChartItem(
+      min: RawNumber(0, ''),
+      lines: [
+        Line(
+          'Load1',
+          [ChartDataPoint(time, RawNumber(rawData.load1, ''))],
+        ),
+        Line(
+          'Load5',
+          [ChartDataPoint(time, RawNumber(rawData.load5, ''))],
+        ),
+        Line(
+          'Load15',
+          [ChartDataPoint(time, RawNumber(rawData.load15, ''))],
+        ),
+      ],
+    );
+    map['CPU Usage'] = ChartItem(
+      min: Percentage(0),
+      max: Percentage(1),
+      lines: [
+        Line(
+          'CPU Usage',
+          [ChartDataPoint(time, Percentage(cpuUsage))],
+        ),
+      ],
+    );
+    if (rawData.cpuMhz != null)
+      map['CPU Frequency'] = ChartItem(
+        min: Frequency(rawData.cpuMinMhz),
+        max: Frequency(rawData.cpuMaxMhz),
         lines: [
           Line(
-            'Upload',
-            [ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed)))],
-          ),
-          Line(
-            'Download',
-            [ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed)))],
+            'CPU Frequency',
+            [ChartDataPoint(time, Frequency(rawData.cpuMhz))],
           ),
         ],
-      ),
-      ChartItem(
-        name: 'Disk IO',
-        min: FileSizePerSecond(FileSize(0)),
-        lines: [
-          Line(
-            'Read',
-            [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed)))],
-          ),
-          Line(
-            'Write',
-            [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed)))],
-          ),
-        ],
-      ),
-      ChartItem(
-        name: 'Disk Usage',
-        min: FileSize(0),
-        max: FileSize.fromKB(rawData.rootTotal),
-        lines: [
-          Line(
-            'Disk Usage',
-            [ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))],
-          ),
-        ],
-      ),
-    ];
+      );
+    map['Network'] = ChartItem(
+      min: FileSizePerSecond(FileSize(0)),
+      lines: [
+        Line(
+          'Upload',
+          [ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed)))],
+        ),
+        Line(
+          'Download',
+          [ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed)))],
+        ),
+      ],
+    );
+    map['Disk IO'] = ChartItem(
+      min: FileSizePerSecond(FileSize(0)),
+      lines: [
+        Line(
+          'Read',
+          [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed)))],
+        ),
+        Line(
+          'Write',
+          [ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed)))],
+        ),
+      ],
+    );
+    map['Disk Usage'] = ChartItem(
+      min: FileSize(0),
+      max: FileSize.fromKB(rawData.rootTotal),
+      lines: [
+        Line(
+          'Disk Usage',
+          [ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))],
+        ),
+      ],
+    );
+    return map;
   }
 
-  List<ChartItem> appendToChartItems(List<ChartItem> chartItems) {
+  Map<String, ChartItem> appendToChartItems(Map<String, ChartItem> chartItems) {
     final time = rawData.time;
-    return chartItems.map((chartItem) {
-      if (chartItem.name == 'Temperature') {
-        return chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))], time);
-      } else if (chartItem.name == 'Memory') {
-        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))], time);
-      } else if (chartItem.name == 'Swap') {
-        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))], time);
-      } else if (chartItem.name == 'Load') {
-        return chartItem.append([
-          ChartDataPoint(time, RawNumber(rawData.load1, '')),
-          ChartDataPoint(time, RawNumber(rawData.load5, '')),
-          ChartDataPoint(time, RawNumber(rawData.load15, '')),
-        ], time);
-      } else if (chartItem.name == 'CPU Usage') {
-        return chartItem.append([ChartDataPoint(time, Percentage(cpuUsage))], time);
-      } else if (chartItem.name == 'CPU Frequency') {
-        return chartItem.append([ChartDataPoint(time, Frequency(rawData.cpuMhz))], time);
-      } else if (chartItem.name == 'Network') {
-        return chartItem.append([
-          ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
-          ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
-        ], time);
-      } else if (chartItem.name == 'Disk IO') {
-        return chartItem.append([
-          ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed))),
-          ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed))),
-        ], time);
-      } else if (chartItem.name == 'Disk Usage') {
-        return chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))], time);
+    return chartItems.map((name, chartItem) {
+      if (name == 'Temperature') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, Temperature(rawData.cpuTemp))], time));
+      } else if (name == 'Memory') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.memUsed))], time));
+      } else if (name == 'Swap') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.swapUsed))], time));
+      } else if (name == 'Load') {
+        return MapEntry(
+          name,
+          chartItem.append([
+            ChartDataPoint(time, RawNumber(rawData.load1, '')),
+            ChartDataPoint(time, RawNumber(rawData.load5, '')),
+            ChartDataPoint(time, RawNumber(rawData.load15, '')),
+          ], time),
+        );
+      } else if (name == 'CPU Usage') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, Percentage(cpuUsage))], time));
+      } else if (name == 'CPU Frequency') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, Frequency(rawData.cpuMhz))], time));
+      } else if (name == 'Network') {
+        return MapEntry(
+            name,
+            chartItem.append([
+              ChartDataPoint(time, FileSizePerSecond(FileSize(networkUpSpeed))),
+              ChartDataPoint(time, FileSizePerSecond(FileSize(networkDownSpeed))),
+            ], time));
+      } else if (name == 'Disk IO') {
+        return MapEntry(
+            name,
+            chartItem.append([
+              ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskReadSpeed))),
+              ChartDataPoint(time, FileSizePerSecond(FileSize.fromKB(diskWriteSpeed))),
+            ], time));
+      } else if (name == 'Disk Usage') {
+        return MapEntry(name, chartItem.append([ChartDataPoint(time, FileSize.fromKB(rawData.rootUsed))], time));
       } else {
-        throw ("Unknown chart item name: ${chartItem.name}");
+        throw ("Unknown chart item name: $name");
       }
-    }).toList();
+    });
   }
 }
 
@@ -273,12 +271,11 @@ class Line {
 }
 
 class ChartItem {
-  final String name;
   final AutoScalableVector max;
   final AutoScalableVector min;
   final List<Line> lines;
 
-  ChartItem({this.name, this.min, this.max, this.lines});
+  ChartItem({this.min, this.max, this.lines});
 
   ChartItem append(List<ChartDataPoint> dataPoints, int time) {
     final newLines = <Line>[];
@@ -286,7 +283,6 @@ class ChartItem {
       newLines.add(lines[i].append(dataPoints[i], time));
     }
     return ChartItem(
-      name: name,
       max: max,
       min: min,
       lines: newLines,

@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
 import 'package:raspi_monitor_app/ssh/sshTools.dart';
@@ -55,8 +56,7 @@ class DataMonitor {
       }
       await disconnectAll(sshClient);
     } catch (e, stacktrace) {
-      print(e);
-      print(stacktrace);
+      Crashlytics.instance.recordError(e, stacktrace);
       throw (e);
     }
   }

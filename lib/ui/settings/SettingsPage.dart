@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide AboutDialog;
+import 'package:raspi_monitor_app/main.dart';
 import 'package:raspi_monitor_app/storage.dart';
 import 'package:raspi_monitor_app/ui/settings/AboutDialog.dart';
 
@@ -20,10 +21,9 @@ class _SettingsPageState extends State<SettingsPage> {
             title: Text('Dashboard Style'),
             trailing: DropdownButton<bool>(
               value: prefs.getBool("prefer_chart") ?? true,
-              onChanged: (newValue) {
-                setState(() {
-                  prefs.setBool("prefer_chart", newValue);
-                });
+              onChanged: (newValue) async {
+                await prefs.setBool("prefer_chart", newValue);
+                setState(() {});
               },
               items: <DropdownMenuItem<bool>>[
                 DropdownMenuItem<bool>(
@@ -45,6 +45,31 @@ class _SettingsPageState extends State<SettingsPage> {
                       Text('Grid'),
                     ],
                   ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            title: Text('Dark Mode'),
+            trailing: DropdownButton<int>(
+              value: prefs.getInt("dark_mode") ?? 0, // -1: off, 0: auto, 1: on
+              onChanged: (newValue) async {
+                await prefs.setInt("dark_mode", newValue);
+                setState(() {});
+                appKey.currentState.updateThemeMode();
+              },
+              items: <DropdownMenuItem<int>>[
+                DropdownMenuItem<int>(
+                  value: -1,
+                  child: Text('Always Off'),
+                ),
+                DropdownMenuItem<int>(
+                  value: 0,
+                  child: Text('Follow System'),
+                ),
+                DropdownMenuItem<int>(
+                  value: 1,
+                  child: Text('Always On'),
                 ),
               ],
             ),

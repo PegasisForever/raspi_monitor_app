@@ -5,16 +5,50 @@ import 'package:raspi_monitor_app/storage.dart';
 import 'package:raspi_monitor_app/ui/homepage/HomePage.dart';
 import 'package:syncfusion_flutter_core/core.dart';
 
+GlobalKey<MyAppState> appKey = GlobalKey();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   SyncfusionLicense.registerLicense(SyncfusionCommunityLicenceKey);
-  initSharedPrefs();
+  await initSharedPrefs();
   initPackageInfo();
-  runApp(MyApp());
+  runApp(MyApp(key: appKey));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  MyApp({Key key}) : super(key: key);
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  ThemeMode _themeMode;
+
+  @override
+  void initState() {
+    _getThemeMode();
+    super.initState();
+  }
+
+  void _getThemeMode(){
+    final darkModeSettings = prefs.getInt("dark_mode") ?? 0;
+    if (darkModeSettings == -1) {
+      _themeMode = ThemeMode.light;
+    } else if (darkModeSettings == 1) {
+      _themeMode = ThemeMode.dark;
+    } else {
+      _themeMode = ThemeMode.system;
+    }
+  }
+
+  void updateThemeMode(){
+    setState(() {
+      _getThemeMode();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var darkTheme = ThemeData.dark();
@@ -24,6 +58,7 @@ class MyApp extends StatelessWidget {
     );
     return MaterialApp(
       title: 'Raspberry Pi Monitor',
+      themeMode: _themeMode,
       theme: ThemeData.light(),
       darkTheme: darkTheme,
       home: HomePage(),

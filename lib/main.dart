@@ -57,6 +57,7 @@ class MyAppState extends State<MyApp> {
       colorScheme: darkTheme.colorScheme.copyWith(secondary: Colors.blue),
     );
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Raspberry Pi Monitor',
       themeMode: _themeMode,
       theme: ThemeData.light(),

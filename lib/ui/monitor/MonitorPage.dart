@@ -33,6 +33,7 @@ class _MonitorPageState extends State<MonitorPage> {
   @override
   void dispose() {
     dataMonitor.stop();
+    if (fullScreened) SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
 

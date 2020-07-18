@@ -33,20 +33,23 @@ dependencies:
   crypto: ^2.1.4
   syncfusion_flutter_charts: ^18.1.59
   intl: ^0.16.1
-  file_picker: ^1.10.0 # todo ios setup https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup#--ios
+  file_picker: ^1.10.0
   auto_size_text: ^2.1.0
   package_info: ^0.4.1
   url_launcher: ^5.4.11
-  firebase_core: ^0.4.5 # todo ios setup
-  firebase_analytics: ^5.0.16 # todo ios setup
-  firebase_crashlytics: ^0.1.3+3 # todo ios setup
+  firebase_core: ^0.4.5
+  firebase_analytics: ^5.0.16
+  firebase_crashlytics: ^0.1.3+3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.3"
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+flutter_icons:
+  android: false
+  ios: true
+  image_path: "images/raw_icon_1024.png"
 
 flutter:
   uses-material-design: true

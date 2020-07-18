@@ -55,8 +55,14 @@ class DataMonitor {
         }
       }
       await disconnectAll(sshClient);
-    } catch (e, stacktrace) {
-      Crashlytics.instance.recordError(e, stacktrace);
+    } catch (e, s) {
+      var sysInfo;
+      if (sshClient != null) {
+        try {
+          sysInfo = await getServerSysInfo(sshClient);
+        } catch (e) {}
+      }
+      Crashlytics.instance.recordError(e, s, context: "Data stream loop, sysInfo: $sysInfo");
       throw (e);
     }
   }

@@ -143,3 +143,7 @@ final apiVersion = 1;
 Future<String> getMonitorDataString(SSHClient client) async {
   return await client.execute('$basePath/raspi_monitor $apiVersion');
 }
+
+Future<String> getServerSysInfo(SSHClient client) async{
+  return await client.execute('$basePath/raspi_monitor info');
+}

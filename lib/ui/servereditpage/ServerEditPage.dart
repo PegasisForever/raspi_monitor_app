@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
@@ -100,7 +101,8 @@ class _ServerEditPageState extends State<ServerEditPage> {
       final client = await getSSHClient(server);
       disconnectAll(client);
       return null;
-    } catch (e) {
+    } catch (e, s) {
+      Crashlytics.instance.recordError(e, s, context: 'Checking server');
       return e;
     }
   }

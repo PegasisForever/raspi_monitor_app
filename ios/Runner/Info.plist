@@ -43,6 +43,7 @@
 	<false/>
 	<key>UIStatusBarHidden</key>
 	<true/>
-
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Read private key file</string>
 </dict>
 </plist>

@@ -12,7 +12,7 @@ class DataChartList extends StatelessWidget {
     final chartItemList = chartItems.entries.toList();
     return ListView.separated(
       shrinkWrap: true,
-      padding: EdgeInsets.only(top: 4),
+      padding: EdgeInsets.only(top: 4, bottom: MediaQuery.of(context).padding.bottom),
       itemCount: chartItemList.length,
       itemBuilder: (BuildContext context, i) {
         return DataChartWidget(chartItemList[i]);

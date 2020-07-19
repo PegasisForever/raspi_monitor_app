@@ -130,16 +130,18 @@ class _MonitorPageState extends State<MonitorPage> {
             },
           ),
           if (fullScreened)
-            Align(
-              alignment: Alignment.topRight,
-              child: IconButton(
-                icon: Icon(Icons.fullscreen_exit),
-                onPressed: () {
-                  SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-                  setState(() {
-                    fullScreened = false;
-                  });
-                },
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: Icon(Icons.fullscreen_exit),
+                  onPressed: () {
+                    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+                    setState(() {
+                      fullScreened = false;
+                    });
+                  },
+                ),
               ),
             )
         ],

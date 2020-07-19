@@ -224,9 +224,11 @@ class DataGrid extends StatelessWidget {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(4),
-      child: body,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: body,
+      ),
     );
   }
 }

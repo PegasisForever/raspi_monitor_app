@@ -52,7 +52,7 @@ class RawMonitorData {
         rootUsed = json["root_used_kb"]?.toDouble(),
         rootTotal = json["root_total_kb"]?.toDouble(),
         diskRead = json["total_disk_read_kb"]?.toDouble(),
-        diskWrite = json["total_disk_read_kb"]?.toDouble(),
+        diskWrite = json["total_disk_write_kb"]?.toDouble(),
         time = json["time"];
 }
 

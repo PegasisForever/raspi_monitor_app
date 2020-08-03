@@ -6,6 +6,7 @@ import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:raspi_monitor_app/model/DataMonitor.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
 import 'package:raspi_monitor_app/storage.dart';
+import 'package:raspi_monitor_app/tools.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataChartList.dart';
 import 'package:raspi_monitor_app/ui/monitor/DataGrid.dart';
 
@@ -131,6 +132,7 @@ class _MonitorPageState extends State<MonitorPage> {
           ),
           if (fullScreened)
             SafeArea(
+              top: !isLandScape(context),
               child: Align(
                 alignment: Alignment.topRight,
                 child: IconButton(

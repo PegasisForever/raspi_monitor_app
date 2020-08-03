@@ -225,6 +225,7 @@ class DataGrid extends StatelessWidget {
     }
 
     return SafeArea(
+       top: !isLandScape(context),
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: body,

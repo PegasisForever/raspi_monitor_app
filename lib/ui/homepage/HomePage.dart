@@ -38,7 +38,8 @@ class _HomePageState extends State<HomePage> {
               onTap: (server) async {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => MonitorPage(server: server)),
+                  MaterialPageRoute(
+                      builder: (_) => MonitorPage(server: server)),
                 );
               },
               onLongPress: (server) {
@@ -49,7 +50,9 @@ class _HomePageState extends State<HomePage> {
                           onEdit: () async {
                             final newServer = await Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => ServerEditPage(server: server)),
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      ServerEditPage(server: server)),
                             );
                             if (newServer != null) {
                               await updateServer(server, newServer);

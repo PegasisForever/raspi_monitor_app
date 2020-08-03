@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easyping/easyping.dart';
 import 'package:flutter/material.dart';
 import 'package:zeroconf/zeroconf.dart';
 
@@ -28,7 +29,7 @@ Future<String> resolveMdns(String name) {
     onScanStopped: () => completer.complete(null),
     onServiceResolved: (Service service) {
       if ((service.name.toLowerCase() == trimmedName ||
-          service.host.toLowerCase() == trimmedName) &&
+              service.host.toLowerCase() == trimmedName) &&
           service.addresses.isNotEmpty) {
         completer.complete(service.addresses[0]);
       }
@@ -39,4 +40,9 @@ Future<String> resolveMdns(String name) {
   zeroconf.startScan(type: "_device-info._tcp");
 
   return completer.future;
+}
+
+Future<bool> addressExists(String address) async {
+  final latency = await ping(address, times: 1);
+  return latency != -1;
 }

@@ -1,6 +1,7 @@
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:raspi_monitor_app/model/Server.dart';
+import 'package:raspi_monitor_app/tools.dart';
 import 'package:ssh/ssh.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -18,8 +19,15 @@ Future<SSHClient> getSSHClient(Server server) async {
     passwordOrKey['passphrase'] = server.passphrase;
   }
 
+  String resolvedIP;
+  if (await addressExists(server.ip)) {
+    resolvedIP = server.ip;
+  } else {
+    resolvedIP = await resolveMdns(server.ip);
+  }
+
   final client = SSHClient(
-    host: server.ip,
+    host: resolvedIP,
     port: server.port,
     username: server.user,
     passwordOrKey: passwordOrKey,
@@ -59,7 +67,8 @@ Future<String> _getSha1(String filePath) async {
 
 Future<List<String>> _getLatestSha1s(String arch) async {
   try {
-    final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
+    final response =
+        await http.get('https://dev.pegasis.site/raspi_monitor/$arch/sha1');
     final lines = response.body.split("\n");
     return [lines[0].split(" ")[0], lines[1].split(" ")[0]]; // unzipped, zipped
   } catch (e) {
@@ -68,8 +77,10 @@ Future<List<String>> _getLatestSha1s(String arch) async {
 }
 
 Future<String> _downloadBinary(String arch) async {
-  final localPath = (await getApplicationDocumentsDirectory()).path + '/$arch/$zippedFileName';
-  final response = await http.get('https://dev.pegasis.site/raspi_monitor/$arch/$zippedFileName');
+  final localPath = (await getApplicationDocumentsDirectory()).path +
+      '/$arch/$zippedFileName';
+  final response = await http
+      .get('https://dev.pegasis.site/raspi_monitor/$arch/$zippedFileName');
   final file = File(localPath);
   await file.create(recursive: true);
   await file.writeAsBytes(response.bodyBytes);
@@ -77,7 +88,8 @@ Future<String> _downloadBinary(String arch) async {
 }
 
 Future<String> _downloadBinaryCached(String arch, String latestSha1) async {
-  final localPath = (await getApplicationDocumentsDirectory()).path + '/$arch/$zippedFileName';
+  final localPath = (await getApplicationDocumentsDirectory()).path +
+      '/$arch/$zippedFileName';
   final localSha1 = await _getSha1(localPath);
   if (latestSha1 == null) {
     // no internet
@@ -119,7 +131,8 @@ Future<void> _setPermission(SSHClient client) async {
   await client.execute('chmod 770 $basePath/$unzippedFileName');
 }
 
-Future<void> _uploadBinaryCached(SSHClient client, String path, String latestSha1) async {
+Future<void> _uploadBinaryCached(
+    SSHClient client, String path, String latestSha1) async {
   final localSha1 = await _getSftpSha1(client);
   if (localSha1 == null || localSha1 != latestSha1) {
     await _uploadBinary(client, path);
@@ -144,6 +157,6 @@ Future<String> getMonitorDataString(SSHClient client) async {
   return await client.execute('$basePath/raspi_monitor $apiVersion');
 }
 
-Future<String> getServerSysInfo(SSHClient client) async{
+Future<String> getServerSysInfo(SSHClient client) async {
   return await client.execute('$basePath/raspi_monitor info');
 }

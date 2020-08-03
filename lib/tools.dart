@@ -34,7 +34,7 @@ Future<String> resolveMdns(String name) {
         completer.complete(service.addresses[0]);
       }
     },
-    onError: () => completer.completeError(null),
+    onError: () => completer.completeError(Exception("Cannot resolve $name.")),
   );
 
   zeroconf.startScan(type: "_device-info._tcp");

@@ -32,7 +32,7 @@ class MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  void _getThemeMode(){
+  void _getThemeMode() {
     final darkModeSettings = prefs.getInt("dark_mode") ?? 0;
     if (darkModeSettings == -1) {
       _themeMode = ThemeMode.light;
@@ -43,7 +43,7 @@ class MyAppState extends State<MyApp> {
     }
   }
 
-  void updateThemeMode(){
+  void updateThemeMode() {
     setState(() {
       _getThemeMode();
     });
@@ -53,6 +53,8 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var darkTheme = ThemeData.dark();
     darkTheme = darkTheme.copyWith(
+      textSelectionHandleColor: Colors.blue,
+      textSelectionColor: Colors.blue[400],
       accentColor: Colors.blue,
       colorScheme: darkTheme.colorScheme.copyWith(secondary: Colors.blue),
     );

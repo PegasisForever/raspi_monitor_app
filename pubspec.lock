@@ -525,6 +525,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.1"
+  zeroconf:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: b9623d9cd5f32e29a2a244675acd2131b2d018df
+      url: "git://github.com/PegasisForever/zeroconf.git"
+    source: git
+    version: "0.0.1"
 sdks:
   dart: ">=2.7.0 <3.0.0"
   flutter: ">=1.12.13+hotfix.5 <2.0.0"

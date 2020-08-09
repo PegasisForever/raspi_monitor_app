@@ -2,7 +2,7 @@
 
 (Theoretically it should work on any arm/x86 linux machine, but I can't guarantee.)
 
-Prerelease download link: [https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ](https://cloud.pegasis.site/s/HoXZEs7wLecMrsZ)
+[Google Play](https://play.google.com/store/apps/details?id=site.pegasis.raspi_monitor_app)
 
 ## Screenshots
 

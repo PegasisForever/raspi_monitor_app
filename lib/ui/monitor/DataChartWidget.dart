@@ -4,7 +4,7 @@ import 'package:raspi_monitor_app/model/Data.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class DataChartWidget extends StatelessWidget {
-  DataChartWidget(this.chartItemEntry);
+  DataChartWidget(this.chartItemEntry, {Key key}) : super(key: key);
 
   final MapEntry<String, ChartItem> chartItemEntry;
 
@@ -12,8 +12,8 @@ class DataChartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = 150.0;
     if (chartItemEntry.value.lines.length > 1) height += 30;
-    final String unit =
-        chartItemEntry.value.max?.getBestUnit() ?? chartItemEntry.value.getMaxInView().value.getBestUnit();
+    final String unit = chartItemEntry.value.max?.getBestUnit() ??
+        chartItemEntry.value.getMaxInView().value.getBestUnit();
     final now = DateTime.now().millisecondsSinceEpoch;
     final start = now - 60 * 1000;
 
@@ -36,11 +36,14 @@ class DataChartWidget extends StatelessWidget {
               tickPosition: TickPosition.inside,
               interval: 5,
               rangePadding: ChartRangePadding.none,
-              labelStyle: ChartTextStyle(fontSize: 0),
               visibleMinimum: DateTime.fromMillisecondsSinceEpoch(start),
+              isVisible: false,
             ),
             primaryYAxis: NumericAxis(
-              desiredIntervals: (chartItemEntry.value.max != null && chartItemEntry.value.min != null) ? 4 : null,
+              desiredIntervals: (chartItemEntry.value.max != null &&
+                      chartItemEntry.value.min != null)
+                  ? 4
+                  : null,
               maximum: chartItemEntry.value.max?.scaleUse(unit),
               minimum: chartItemEntry.value.min?.scaleUse(unit),
               labelFormat: '{value}$unit',
@@ -59,8 +62,10 @@ class DataChartWidget extends StatelessWidget {
                 animationDuration: 0,
                 dataSource: line.data,
                 name: line.name,
-                xValueMapper: (ChartDataPoint dataPoint, _) => DateTime.fromMillisecondsSinceEpoch(dataPoint.time),
-                yValueMapper: (ChartDataPoint dataPoint, _) => dataPoint.value.scaleUse(unit),
+                xValueMapper: (ChartDataPoint dataPoint, _) =>
+                    DateTime.fromMillisecondsSinceEpoch(dataPoint.time),
+                yValueMapper: (ChartDataPoint dataPoint, _) =>
+                    dataPoint.value.scaleUse(unit),
                 width: 2,
               );
             }).toList(),

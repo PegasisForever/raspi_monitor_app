@@ -12,14 +12,20 @@ class DataChartList extends StatelessWidget {
   Widget build(BuildContext context) {
     final chartItemList = chartItems.entries.toList();
     return ListView.separated(
+      key: Key("data chart list"),
       shrinkWrap: true,
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).padding.bottom,
-          top: (isLandScape(context) ? 0.0 : MediaQuery.of(context).padding.top) +
+          top: (isLandScape(context)
+                  ? 0.0
+                  : MediaQuery.of(context).padding.top) +
               4),
       itemCount: chartItemList.length,
       itemBuilder: (BuildContext context, i) {
-        return DataChartWidget(chartItemList[i]);
+        return DataChartWidget(
+          chartItemList[i],
+          key: Key(chartItemList[i].key),
+        );
       },
       separatorBuilder: (_, __) => Divider(),
     );

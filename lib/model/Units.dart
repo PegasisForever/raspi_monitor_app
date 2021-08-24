@@ -100,7 +100,7 @@ class FileSize implements AutoScalableVector {
     } else if (unit == 'TB') {
       return rawValue / 1024 / 1024 / 1024 / 1024;
     } else {
-      throw ('Unkown unit: $unit');
+      throw ('Unknown unit: $unit');
     }
   }
 
@@ -176,7 +176,7 @@ class Frequency implements AutoScalableVector {
     } else if (unit == 'GHz') {
       return rawValue / 1000;
     } else {
-      throw ('Unkown unit: $unit');
+      throw ('Unknown unit: $unit');
     }
   }
 
